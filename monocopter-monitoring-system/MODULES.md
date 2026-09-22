@@ -74,21 +74,109 @@ Pre-flight checklist (motors, IMU, navigation, camera, obstacle sensors, comms l
 - Mock: `src/data/mock-system-status.ts`, `src/hooks/use-mock-signal-feed.ts`
 - Needs from backend: flight-controller pre-flight diagnostic report, comms link RSSI/quality
 
-### 6–12. Not started ⬜
+### 6. Actionable Alerts ⬜
 
-No functionality written yet — placeholder files only, scaffolded so file structure stays consistent no matter who picks up a module. Each stub page renders a "not yet built" message and is not wired into `App.tsx`/the sidebar. Mapping & Location has a wireframe in `Dashboard Features.pdf` (page 2); the rest don't, so their layout will be designed fresh when we get to them, same approach as modules 2–5.
+**Purpose (from the PDF):** "Know what happened and what to do next" — severity + recommended action. This is the cross-module event feed: a low battery, a gas danger reading, a person detected — anything another module's `Status` goes to `warning`/`danger` should be able to surface here as one alert, not just in its own tab.
 
-| # | Section | Slug | Stub page | Stub data | Stub hook | Components folder |
-|---|---|---|---|---|---|---|
-| 6 | Actionable Alerts | `alerts` | `src/pages/alerts-page.tsx` | `src/data/mock-alerts.ts` | `src/hooks/use-mock-alerts-feed.ts` | `src/components/alerts/` |
-| 7 | Mapping & Location | `map` | `src/pages/map-page.tsx` | `src/data/mock-map.ts` | `src/hooks/use-mock-map-feed.ts` | `src/components/map/` |
-| 8 | Mission Status | `mission` | `src/pages/mission-page.tsx` | `src/data/mock-mission.ts` | `src/hooks/use-mock-mission-feed.ts` | `src/components/mission/` |
-| 9 | Thermal View & Detection | `thermal` | `src/pages/thermal-page.tsx` | `src/data/mock-thermal.ts` | `src/hooks/use-mock-thermal-feed.ts` | `src/components/thermal/` |
-| 10 | Communication & Connectivity | `communication` | `src/pages/communication-page.tsx` | `src/data/mock-communication.ts` | `src/hooks/use-mock-communication-feed.ts` | `src/components/communication/` |
-| 11 | Flight Path & Mission History | `history` | `src/pages/history-page.tsx` | `src/data/mock-history.ts` | `src/hooks/use-mock-history-feed.ts` | `src/components/history/` |
-| 12 | Rescue Intelligence & Recommended Actions | `rescue-intel` | `src/pages/rescue-intel-page.tsx` | `src/data/mock-rescue-intel.ts` | `src/hooks/use-mock-rescue-intel-feed.ts` | `src/components/rescue-intel/` |
+**Planned content:**
+- A scrollable feed of alert cards, newest first, each with: severity (`warning`/`danger`, reuse `Status`), a one-line title ("Battery critical — 18%"), a short detail sentence, which module/sensor it came from, a timestamp, and a recommended action sentence (e.g. "Return to base immediately").
+- Filter/tab by severity or by source module (optional, nice-to-have not required for v1).
+- An acknowledge/dismiss action per alert (local state is fine for v1 — no backend persistence needed yet).
+- Empty state: "No active alerts" — don't fake an alert just to have something to show.
 
-Note some of these will likely end up composed as a tab inside an existing nav page rather than a standalone route — e.g. Thermal probably folds into Live Feed's existing RGB/Thermal toggle, and Communication probably folds into Monocopter (which already has a signal-strength card). That's a wiring decision to make when actually building each one, same as how Gas Trends and Environment Insights ended up sharing the "Environment" nav item. The stub page/component folder exists either way — worst case it stays a thin wrapper that composes into a tab.
+**Data shape to design around:**
+```ts
+type AlertEvent = {
+  id: string
+  severity: "warning" | "danger"
+  title: string
+  detail: string
+  source: "battery" | "gas" | "detection" | "monocopter" | ...
+  time: string
+  recommendedAction: string
+  acknowledged: boolean
+}
+```
+
+**Reuse:** `Status`/`STATUS_*` from `src/lib/status.ts`, `Badge`, `Card`. This module has no sensor of its own — it's a rollup, so building it well means reading the `Status` each existing module already computes (battery %, gas readings, detection state) rather than re-deriving thresholds. Worth deciding whether it polls each module's hook directly or whether there should be a shared "alerts bus" — that's an open design call for whoever builds this.
+
+- Stub: `src/pages/alerts-page.tsx`, `src/data/mock-alerts.ts`, `src/hooks/use-mock-alerts-feed.ts`, `src/components/alerts/`
+
+### 7. Mapping & Location ⬜
+
+**Has a wireframe** — `Dashboard Features.pdf` page 2, "Live Mine Mapping & Monocopter Location." Follow it closely, it's detailed:
+
+**Planned content (from the wireframe):**
+- Main panel: a top-down mine map (tunnels as line-art, dark background) showing: the monocopter's current position (icon), its flight path so far (dashed line), waypoints (numbered circles, WP-1/WP-2/...), a detected-human marker at its last known position, a hazard-zone marker (hatched area), a blocked-path marker.
+- Sector/view selector (dropdown, e.g. "Sector B") and a "3D View" toggle button (can stay a disabled/"coming soon" button for v1 — no need to build actual 3D).
+- Right rail: "Monocopter Location & Status" card — current X/Y/Z coordinates, current sector, flight mode (Autonomous/Manual), battery level (reuse the battery gauge/bar styling from Module 3 for consistency), signal strength (reuse Module 5's signal card styling), speed, altitude from ground.
+- A map legend (mine tunnel line, flight path line, waypoint marker, detected-human marker, hazard-zone pattern, blocked-path marker, entrance/exit marker).
+- Bottom row, three cards: "Sector Information" (name, avg depth, total tunnel length, mapped area, unexplored area), "Quick Actions" (Set Waypoint / Send Monocopter Here / Mark Hazard Zone / Add Note — buttons, can be inert/disabled for v1 since there's no monocopter to command yet), "Key Locations" table (type, name, distance, status — entrance/waypoints/hazards/detected humans as rows).
+
+**Reuse:** the detected-human marker should pull from the same detection data Module 1 already has (`src/lib/detection-types.ts`) rather than inventing a separate shape for "a person was detected here." No real positioning system exists yet (see Module 5's note on GPS not working underground) — mock coordinates are fine, but don't fabricate a precision GPS reading; frame it as inertial/SLAM-estimated position, consistent with Module 5's honesty about navigation.
+
+- Stub: `src/pages/map-page.tsx`, `src/data/mock-map.ts`, `src/hooks/use-mock-map-feed.ts`, `src/components/map/`
+
+### 8. Mission Status ⬜
+
+**Purpose:** no PDF wireframe or highlight bullet for this one — just the section name. Reasonable scope for v1, open to revision when actually built:
+
+**Planned content:**
+- Mission phase badge (e.g. Idle / En Route / Searching / Returning / Complete).
+- Elapsed mission time (can reuse the same real-wall-clock pattern as Module 3's "Mission Flight Time").
+- Current objective / current waypoint or sector.
+- An objective checklist with progress (e.g. "Reach Sector B" ✓, "Scan for survivors" ✓, "Return to base" ○).
+- Consider whether this overlaps with Module 11 (Flight Path & Mission History) — Mission Status is "what's happening now," History is "what happened on past missions." Keep them distinct rather than merging.
+
+- Stub: `src/pages/mission-page.tsx`, `src/data/mock-mission.ts`, `src/hooks/use-mock-mission-feed.ts`, `src/components/mission/`
+
+### 9. Thermal View & Detection ⬜
+
+**Purpose:** thermal-camera counterpart to Module 1's RGB detection, once real thermal hardware exists.
+
+**Likely composition:** Module 1's `VideoPanel` (`src/components/live-feed/video-panel.tsx`) already has an RGB/Thermal tab that currently shows an honest "Thermal camera not connected" placeholder. The straightforward path is to make that tab real (point it at a thermal stream + thermal-based detections) rather than building a whole separate page — avoid duplicating the video-panel/detection-card/history-table pattern Module 1 already has.
+
+**Planned content, if/when there's a real thermal feed:**
+- False-color heatmap video (same MJPEG-from-backend pattern `detection-server/` already uses for RGB — the backend would need a second camera source and a temperature-to-color mapping).
+- A temperature-range legend (color gradient with min/max °C).
+- Heat-signature detection markers with confidence, similar shape to `DetectionEvent` in `src/lib/detection-types.ts`.
+
+Don't fake a thermal filter over RGB footage to simulate this — that would misrepresent a sensor reading that doesn't exist. Keep the honest "not connected" state until real thermal hardware is wired in.
+
+- Stub: `src/pages/thermal-page.tsx`, `src/data/mock-thermal.ts`, `src/hooks/use-mock-thermal-feed.ts`, `src/components/thermal/`
+
+### 10. Communication & Connectivity ⬜
+
+**Likely composition:** Module 5 (Monocopter Health) already has a `SignalStrengthCard` (`src/components/monocopter/signal-strength-card.tsx`) for the base-station comms link. This module is probably that card's fuller expansion, best added as a third tab on the Monocopter page rather than a new standalone route.
+
+**Planned content:**
+- Everything `SignalStrengthCard` already shows (link %, status), plus: latency, packet loss %, uplink/downlink data rate, and a connection-quality history chart over time (reuse the `recharts` line/area-with-reference-lines pattern from Module 2/3's trend charts).
+- A connection-events log (link dropped / reconnected, timestamped) — similar shape to `DetectionEvent`'s history pattern.
+
+- Stub: `src/pages/communication-page.tsx`, `src/data/mock-communication.ts`, `src/hooks/use-mock-communication-feed.ts`, `src/components/communication/`
+
+### 11. Flight Path & Mission History ⬜
+
+**Purpose:** a log of *past* missions, distinct from Module 8's "what's happening right now."
+
+**Planned content:**
+- A list/table of past mission sessions: date, duration, distance covered, sectors visited, number of detections made, number of alerts triggered, outcome.
+- Clicking a session could show its flight path replayed on a static map (reuse Module 7's map rendering once that exists, rather than building a second map component).
+- Pairs naturally with Module 6 (Alerts) — a past mission's alert count could link to the specific `AlertEvent`s from that session, if alert data ends up persisted anywhere.
+
+- Stub: `src/pages/history-page.tsx`, `src/data/mock-history.ts`, `src/hooks/use-mock-history-feed.ts`, `src/components/history/`
+
+### 12. Rescue Intelligence & Recommended Actions ⬜
+
+**Purpose (from the PDF's value proposition):** "Act → Alerts, victim location & recommended actions." This heavily overlaps with Module 6 (Actionable Alerts) — read that section first. The distinction to design for: Module 6 is a *feed* of individual events; this module is meant to be the single, composite, highest-priority synthesis — e.g. combining "Person detected in Sector B" + "Gas: Danger" + "Anomaly: Detected" into one strategic recommendation ("Do not send a rescue team without gas masks; prioritize evacuation of Sector B"), matching the worked example in the original project brief.
+
+**Planned content:**
+- A single prominent panel (not a feed) for the current highest-priority situation, if any: victim location, contributing factors (which sensors triggered it), and a recommended course of action in plain language.
+- Empty state when nothing rises to this level: don't show a fabricated "all clear, recommend nothing" card, just omit the panel or show a quiet "no active rescue situation."
+
+**Before building this:** decide with whoever builds Module 6 whether this is a separate page/component that *reads* the same alert data, or a special "priority" rendering mode inside Module 6's feed. Building both independently risks two different definitions of "how bad is bad enough."
+
+- Stub: `src/pages/rescue-intel-page.tsx`, `src/data/mock-rescue-intel.ts`, `src/hooks/use-mock-rescue-intel-feed.ts`, `src/components/rescue-intel/`
 
 ## Shared infrastructure (not a module, used by all of them)
 
