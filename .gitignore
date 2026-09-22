@@ -1,0 +1,39 @@
+# Node (monocopter-monitoring-system)
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Python (detection-server)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editor / OS junk
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Claude Code session state
+.claude/
+
+# Not part of this repo: this folder only contains the dashboard
+# (monocopter-monitoring-system/) and the detection backend
+# (detection-server/, including the one trained model it needs). The ML
+# training project, dataset, and design brief live alongside on disk but
+# aren't pushed here.
+SIH2026_MineRescue/
+Dashboard Features.pdf
