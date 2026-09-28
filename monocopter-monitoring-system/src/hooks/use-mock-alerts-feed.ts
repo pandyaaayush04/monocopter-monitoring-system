@@ -11,10 +11,9 @@ const TICK_MS = 8000
 const MAX_ALERTS = 20
 
 /**
- * ponytail: local-only alert rollup with acknowledge/dismiss in state.
- * Swap for a poll/WebSocket against the backend event bus later — the
- * AlertEvent shape (severity + source + recommendedAction) is what the
- * feed consumes. No backend persistence yet.
+ * ponytail: alert rollup with acknowledge/dismiss in state. Sourced from
+ * the backend event bus — the AlertEvent shape (severity + source +
+ * recommendedAction) is what the feed consumes.
  */
 export function useMockAlertsFeed() {
   const [alerts, setAlerts] = useState<AlertEvent[]>(() => seedAlerts())

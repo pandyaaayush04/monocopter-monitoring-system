@@ -29,12 +29,23 @@ from ultralytics import YOLO
 
 MODEL_PATH = "models/best.pt"
 
-# Webcam by default (0 = first camera). Point this at a phone instead by
-# setting CAMERA_SOURCE to the phone's stream URL, e.g. with the "IP Webcam"
-# Android app: CAMERA_SOURCE="http://192.168.1.23:8080/video" (or DroidCam,
-# similar idea). cv2.VideoCapture accepts either an int index or a URL string.
-_camera_env = os.environ.get("CAMERA_SOURCE", "0")
-CAMERA_INDEX: int | str = int(_camera_env) if _camera_env.isdigit() else _camera_env
+# Webcam by default (0 = first camera). Point this at a phone, a video file, or a
+# comma-separated playlist of video files instead by setting CAMERA_SOURCE, e.g.
+# with the "IP Webcam" Android app: CAMERA_SOURCE="http://192.168.1.23:8080/video"
+# (or DroidCam, similar idea), or a looping simulation playlist (the default below).
+# cv2.VideoCapture accepts an int index, a URL string, or a file path.
+_DEFAULT_SOURCES = (
+    "../monocopter-monitoring-system/public/video/rgb-1.mp4,"
+    "../monocopter-monitoring-system/public/video/rgb-2.mp4"
+)
+_camera_env = os.environ.get("CAMERA_SOURCE", _DEFAULT_SOURCES)
+
+
+def _parse_source(raw: str) -> int | str:
+    return int(raw) if raw.isdigit() else raw
+
+
+CAMERA_SOURCES: list[int | str] = [_parse_source(s.strip()) for s in _camera_env.split(",") if s.strip()] or [0]
 CONF_THRESHOLD = 0.40
 IMG_SIZE = 640
 SECTOR = "Sector B"  # no positioning system yet; static placeholder, same as the UI mock it replaces
@@ -60,21 +71,45 @@ _ids = count(1)
 
 def run_capture_loop():
     model = YOLO(MODEL_PATH)
-    cap = cv2.VideoCapture(CAMERA_INDEX)
+    source_idx = 0
+    cap = cv2.VideoCapture(CAMERA_SOURCES[source_idx])
+    frame_interval = 0.0  # only paced for video files; live cameras block naturally on read()
+
+    def is_live_camera(source) -> bool:
+        return isinstance(source, int)
+
+    def open_source(idx: int) -> cv2.VideoCapture:
+        c = cv2.VideoCapture(CAMERA_SOURCES[idx])
+        with state_lock:
+            state["camera_open"] = c.isOpened()
+        return c
+
+    if not is_live_camera(CAMERA_SOURCES[source_idx]):
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        frame_interval = 1.0 / fps if fps and fps > 0 else 0.0
 
     with state_lock:
         state["camera_open"] = cap.isOpened()
 
     if not cap.isOpened():
-        print(f"Could not open camera index {CAMERA_INDEX}. /video_feed and detections will stay empty.")
+        print(f"Could not open source {CAMERA_SOURCES[source_idx]!r}. /video_feed and detections will stay empty.")
         return
 
     last_sample = 0.0
 
     while True:
+        loop_start = time.monotonic()
         ok, frame = cap.read()
         if not ok:
-            time.sleep(0.5)
+            if is_live_camera(CAMERA_SOURCES[source_idx]):
+                time.sleep(0.5)
+                continue
+            # end of this video file - advance to the next source and loop the playlist
+            cap.release()
+            source_idx = (source_idx + 1) % len(CAMERA_SOURCES)
+            cap = open_source(source_idx)
+            fps = cap.get(cv2.CAP_PROP_FPS)
+            frame_interval = 1.0 / fps if fps and fps > 0 else 0.0
             continue
 
         results = model.predict(source=frame, conf=CONF_THRESHOLD, imgsz=IMG_SIZE, verbose=False)
@@ -120,6 +155,11 @@ def run_capture_loop():
             if elapsed - last_sample >= HISTORY_SAMPLE_SECONDS:
                 last_sample = elapsed
                 state["history"].appendleft({"id": f"h{next(_ids)}", **detection})
+
+        if frame_interval:
+            remaining = frame_interval - (time.monotonic() - loop_start)
+            if remaining > 0:
+                time.sleep(remaining)
 
 
 @asynccontextmanager

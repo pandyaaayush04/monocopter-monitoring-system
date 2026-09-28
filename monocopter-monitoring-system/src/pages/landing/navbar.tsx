@@ -1,9 +1,12 @@
 import { useState } from "react"
-import { ArrowRightIcon, ListIcon, MoonIcon, SunIcon } from "@phosphor-icons/react"
+import { ArrowRightIcon, ListIcon, MoonIcon, SignOutIcon, SunIcon } from "@phosphor-icons/react"
 
 import { MinewatchMark } from "@/components/minewatch-mark"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useAuth } from "@/lib/auth-context"
 
 const LINKS = [
   { label: "Home", href: "#top" },
@@ -14,19 +17,31 @@ const LINKS = [
   { label: "About", href: "#about" },
 ]
 
+function initialsOf(name: string) {
+  return name
+    .split(" ")
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase()
+}
+
 export function Navbar({
   onExplore,
   theme,
   onToggleTheme,
+  onOpenAuth,
 }: {
   onExplore: () => void
   theme: "dark" | "light"
   onToggleTheme: () => void
+  onOpenAuth: (mode: "login" | "register") => void
 }) {
   const [open, setOpen] = useState(false)
+  const { user, status, logout } = useAuth()
 
   return (
-    <header className="bg-background/90 sticky top-0 z-40 border-b backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-transparent bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:px-6">
         <a href="#top" className="flex items-center gap-2.5">
           <MinewatchMark className="h-8 w-8" />
@@ -53,8 +68,31 @@ export function Navbar({
           >
             {theme === "dark" ? <SunIcon /> : <MoonIcon />}
           </Button>
+          {status === "signed-in" && user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="hidden items-center gap-2 sm:inline-flex" aria-label="Account menu">
+                  <Avatar size="sm">
+                    <AvatarFallback>{initialsOf(user.name)}</AvatarFallback>
+                  </Avatar>
+                  <span className="max-w-28 truncate">{user.name}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel className="truncate">{user.email}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => logout()} variant="destructive">
+                  <SignOutIcon /> Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="outline" onClick={() => onOpenAuth("login")} className="hidden sm:inline-flex">
+              Login
+            </Button>
+          )}
           <Button onClick={onExplore} className="hidden sm:inline-flex">
-            Explore System
+            {status === "signed-in" ? "Explore System" : "Get Started"}
             <ArrowRightIcon />
           </Button>
           <Sheet open={open} onOpenChange={setOpen}>
@@ -74,14 +112,36 @@ export function Navbar({
                   {l.label}
                 </a>
               ))}
+              {status === "signed-in" && user ? (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setOpen(false)
+                    logout()
+                  }}
+                  className="mt-4"
+                >
+                  <SignOutIcon /> Sign out ({user.name})
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setOpen(false)
+                    onOpenAuth("login")
+                  }}
+                  className="mt-4"
+                >
+                  Login
+                </Button>
+              )}
               <Button
                 onClick={() => {
                   setOpen(false)
                   onExplore()
                 }}
-                className="mt-4"
               >
-                Explore System
+                {status === "signed-in" ? "Explore System" : "Get Started"}
                 <ArrowRightIcon />
               </Button>
             </SheetContent>

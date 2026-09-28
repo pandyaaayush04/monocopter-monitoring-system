@@ -10,7 +10,7 @@ import {
   GlobeIcon,
 } from "@phosphor-icons/react"
 
-import { MonocopterMark } from "@/components/monocopter-mark"
+import { MinewatchMark } from "@/components/minewatch-mark"
 
 import {
   Sidebar,
@@ -50,8 +50,8 @@ export function AppSidebar({
     <Sidebar collapsible="icon">
       <SidebarHeader className="items-center py-4">
         <div className="flex items-center gap-2 px-2 group-data-[collapsible=icon]:px-0">
-          <div className="smooth-shadow-ring-xs flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <MonocopterMark className="size-5.5" />
+          <div className="flex size-9 shrink-0 items-center justify-center">
+            <MinewatchMark className="size-8" />
           </div>
           <div className="flex flex-col leading-none group-data-[collapsible=icon]:hidden">
             <span className="font-heading text-sm font-semibold">Mine Rescue</span>

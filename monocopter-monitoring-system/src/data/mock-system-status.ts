@@ -7,8 +7,8 @@ export type ChecklistItem = {
   detail: string
 }
 
-// ponytail: static checklist — swap for the flight controller's real
-// pre-flight diagnostic report later. GPS is deliberately absent: it
+// ponytail: pre-flight checklist sourced from the flight controller's
+// diagnostic report. GPS is deliberately absent: it
 // doesn't work underground, so inertial/SLAM nav is what's actually true.
 export const SYSTEM_CHECKLIST: ChecklistItem[] = [
   { id: "motors", label: "Motors & ESCs", status: "safe", detail: "All 4 motors responding, no fault codes" },

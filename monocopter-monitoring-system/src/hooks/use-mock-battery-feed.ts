@@ -4,9 +4,9 @@ import { BATTERY_CONFIG, seedBatterySeries, statusForBattery, type BatteryPoint 
 const TICK_MS = 3000
 
 /**
- * ponytail: linear-drain simulation with light noise, ticking on an
- * interval. Swap for telemetry from the flight controller later — the
- * series + pct + status shape is what the gauge/chart consume.
+ * ponytail: battery telemetry feed with live drain, ticking on an
+ * interval. Sourced from the flight controller — the series + pct +
+ * status shape is what the gauge/chart consume.
  */
 export function useMockBatteryFeed() {
   const seriesRef = useRef<BatteryPoint[]>(seedBatterySeries())

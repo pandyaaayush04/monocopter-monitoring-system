@@ -14,9 +14,11 @@ import { HistoryPage } from "@/pages/history-page"
 import { RescueIntelPage } from "@/pages/rescue-intel-page"
 import { LandingPage } from "@/pages/landing/landing-page"
 import { AlertsProvider } from "@/lib/alerts-bus"
+import { AuthProvider } from "@/lib/auth-context"
+import { ErrorBoundary } from "@/components/error-boundary"
 import { PAGE_META, type PageKey } from "@/lib/pages"
 
-export default function App() {
+function AppShell() {
   const [view, setView] = useState<"site" | "console">("site")
   const [page, setPage] = useState<PageKey>("live-feed")
   const meta = PAGE_META[page]
@@ -44,5 +46,15 @@ export default function App() {
       </SidebarProvider>
       </AlertsProvider>
     </TooltipProvider>
+  )
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppShell />
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }

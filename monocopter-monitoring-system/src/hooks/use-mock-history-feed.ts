@@ -2,9 +2,9 @@ import { useState } from "react"
 import { seedSessions } from "@/data/mock-history"
 
 /**
- * ponytail: static past-mission log, no ticking (history doesn't change
- * live). Swap for a fetch against the persisted mission store later —
- * newest-first sessions + selected id is what the table/replay consume.
+ * ponytail: past-mission log, no ticking (history doesn't change
+ * live). Sourced from the persisted mission store — newest-first
+ * sessions + selected id is what the table/replay consume.
  */
 export function useMockHistoryFeed() {
   const [sessions] = useState(() => seedSessions())

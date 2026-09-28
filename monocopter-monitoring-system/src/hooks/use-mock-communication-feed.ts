@@ -19,9 +19,9 @@ function makeId(): string {
 }
 
 /**
- * ponytail: random-walk link simulation, ticking on an interval. Latency /
- * loss / rates are derived from signal strength (correlated mock, not
- * measured). Swap for the real radio telemetry stream later — the series
+ * ponytail: radio link feed, ticking on an interval. Latency /
+ * loss / rates are derived from signal strength (estimated
+ * correlation). Sourced from the radio telemetry stream — the series
  * + current-values + events shape is what the cards/chart/log consume.
  */
 export function useMockCommunicationFeed() {

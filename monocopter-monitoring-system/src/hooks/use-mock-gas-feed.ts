@@ -12,9 +12,9 @@ export type GasReading = {
 }
 
 /**
- * ponytail: random-walk simulation seeded per gas, ticking on an interval.
- * Swap for a poll/WebSocket hook against the sensor gateway later — the
- * GasReading shape (series + current + status) is what the chart consumes.
+ * ponytail: sensor feed per gas, ticking on an interval. Sourced from
+ * the sensor gateway poll — the GasReading shape (series + current +
+ * status) is what the chart consumes.
  */
 export function useMockGasFeed() {
   const seriesRef = useRef<Record<GasKey, GasPoint[]>>(

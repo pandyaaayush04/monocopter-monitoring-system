@@ -9,7 +9,7 @@ export function TemperatureLegend({ online }: { online: boolean }) {
       <CardHeader className="px-4">
         <CardTitle className="text-sm font-semibold">Temperature Range</CardTitle>
         <p className="text-muted-foreground text-xs">
-          {online ? "Live false-color scale" : "Expected scale — no live data yet"}
+          {online ? "Live false-color scale" : "Reference scale"}
         </p>
       </CardHeader>
       <CardContent className={`flex flex-col gap-1.5 px-4 ${online ? "" : "opacity-60"}`}>

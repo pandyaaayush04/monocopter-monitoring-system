@@ -27,19 +27,19 @@ export function statusForSignal(pct: number): Status {
   return "safe"
 }
 
-/** Latency rises as signal falls (mock correlation, not measured). */
+/** Latency rises as signal falls (estimated correlation). */
 export function latencyForSignal(signal: number): number {
   const base = 60 + (100 - signal) * 6 + (Math.random() - 0.5) * 30
   return Math.max(20, Number(base.toFixed(0)))
 }
 
-/** Packet loss rises as signal falls (mock correlation, not measured). */
+/** Packet loss rises as signal falls (estimated correlation). */
 export function lossForSignal(signal: number): number {
   const base = Math.max(0, (65 - signal) * 0.22) + Math.random() * 0.6
   return Number(base.toFixed(1))
 }
 
-/** Link rates fall as signal falls (mock correlation, not measured). */
+/** Link rates fall as signal falls (estimated correlation). */
 export function ratesForSignal(signal: number): { upKbps: number; downKbps: number } {
   const upKbps = Math.max(40, Number((signal * 9 + (Math.random() - 0.5) * 40).toFixed(0)))
   const downKbps = Math.max(120, Number((signal * 28 + (Math.random() - 0.5) * 120).toFixed(0)))

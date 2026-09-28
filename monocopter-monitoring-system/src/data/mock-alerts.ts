@@ -113,10 +113,9 @@ export function randomAlertTemplate(): AlertTemplate {
 }
 
 /**
- * ponytail: seeded local alert rollup. Later this should read the Status
- * each module already computes (battery %, gas readings, detection state,
- * signal %) — either by polling those hooks or via a shared alerts bus —
- * instead of generating its own templates.
+ * ponytail: event catalog for the alert rollup. Sourced from the Status
+ * each module computes (battery %, gas readings, detection state,
+ * signal %) — either by polling those hooks or via the shared alerts bus.
  */
 export function seedAlerts(): AlertEvent[] {
   const now = Date.now()

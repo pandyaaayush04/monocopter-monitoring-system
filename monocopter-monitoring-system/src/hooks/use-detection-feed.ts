@@ -10,7 +10,7 @@ const IDLE_EVENT: DetectionEvent = { id: "idle", time: "--:--:--", label: "No Pe
 
 /**
  * Polls the detection-server (see /detection-server) for the live YOLO
- * feed. No mock fallback: if the backend is unreachable, `online` goes
+ * feed. No fallback: if the backend is unreachable, `online` goes
  * false and callers should show that honestly rather than fake data.
  */
 export function useDetectionFeed() {

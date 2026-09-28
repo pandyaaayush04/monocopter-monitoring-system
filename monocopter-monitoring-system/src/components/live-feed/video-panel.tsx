@@ -31,7 +31,7 @@ export function VideoPanel({
   const panelRef = useRef<HTMLDivElement>(null)
   const [source, setSource] = useState<"rgb" | "thermal">("rgb")
   const [recording, setRecording] = useState(false)
-  const { online: thermalOnline, detections: thermalDetections } = useMockThermalFeed()
+  const { online: thermalOnline, setOnline: setThermalOnline, detections: thermalDetections } = useMockThermalFeed()
 
   const ready = online && cameraOpen
 
@@ -102,7 +102,7 @@ export function VideoPanel({
       </div>
         ) : (
           <div className="flex flex-col gap-3">
-            <ThermalViewPanel online={thermalOnline} />
+            <ThermalViewPanel online={thermalOnline} onError={() => setThermalOnline(false)} />
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <TemperatureLegend online={thermalOnline} />
               <ThermalDetectionsCard detections={thermalDetections} online={thermalOnline} />

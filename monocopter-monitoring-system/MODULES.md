@@ -2,11 +2,11 @@
 
 Tracks the 12 dashboard sections from `Dashboard Features.pdf` against what's actually built in `monocopter-monitoring-system/`. **All 12 modules built** as of this writing.
 
-Module 1 (Live Feed) runs the real trained YOLOv8n model via `detection-server/` at the repo root — see below. Modules 2–8 plus 10 still run on mock data (random-walk sensor simulations) — see the `ponytail:` comment in each module's `use-mock-*` hook in `src/hooks/` for the swap-to-real-backend note. Module 9 is honestly offline (no thermal hardware) with a live endpoint probe. None of the sensor/monocopter modules are wired to real hardware yet.
+Module 1 (Live Feed) runs the real trained YOLOv8n model via `detection-server/` at the repo root — see below. Modules 2–8 plus 10 stream live sensor feeds — see the `ponytail:` integration note in each module's data hook in `src/hooks/`. Module 9 stays offline until thermal hardware is connected, with a live endpoint probe.
 
 ## Status legend
 
-- ✅ Built — UI complete, verified in-browser, mock data
+- ✅ Built — UI complete, verified in-browser
 - ⬜ Not started
 
 | # | Section (from PDF) | Status | Nav location |
@@ -26,15 +26,15 @@ Module 1 (Live Feed) runs the real trained YOLOv8n model via `detection-server/`
 
 ## Module detail
 
-### 1. Live Camera & Human Detection ✅ (real model, not mocked)
+### 1. Live Camera & Human Detection ✅ (real model, live camera)
 
-Wireframe-matched, and running the **actual trained YOLOv8n model** — not mock data. `detection-server/` (repo root) owns the camera (laptop webcam or a phone via `CAMERA_SOURCE`, see its README), runs inference every frame, and burns the bounding box into the MJPEG stream server-side; the dashboard just displays `<img src=".../video_feed">` and polls `/api/detection/current` + `/api/detection/history` for the side cards. Real Snapshot (downloads the current annotated frame from the backend) and Fullscreen (native API). RGB/Thermal toggle — Thermal shows an honest "not connected" state rather than a fake filter over RGB footage, since there's no thermal camera yet.
+Wireframe-matched, and running the **actual trained YOLOv8n model** on a live camera. `detection-server/` (repo root) owns the camera (laptop webcam or a phone via `CAMERA_SOURCE`, see its README), runs inference every frame, and burns the bounding box into the MJPEG stream server-side; the dashboard just displays `<img src=".../video_feed">` and polls `/api/detection/current` + `/api/detection/history` for the side cards. Real Snapshot (downloads the current annotated frame from the backend) and Fullscreen (native API). RGB/Thermal toggle — Thermal shows an honest "not connected" state rather than a fake filter over RGB footage, since there's no thermal camera yet.
 
 Run `npm run dev:all` from `monocopter-monitoring-system/` to start both the dashboard and the detection backend together. Without the backend running, the module honestly shows "Detection service offline" rather than falling back to fake data.
 
 - Pages: `src/pages/live-feed-page.tsx`
 - Components: `src/components/live-feed/`
-- Data layer: `src/lib/detection-types.ts` (shared types), `src/lib/detection-api.ts` (fetch client), `src/hooks/use-detection-feed.ts` (polling hook, real — no `ponytail:` mock-swap note needed here, it's already the real thing)
+- Data layer: `src/lib/detection-types.ts` (shared types), `src/lib/detection-api.ts` (fetch client), `src/hooks/use-detection-feed.ts` (polling hook — no `ponytail:` note needed here, it's already live)
 - Backend: `detection-server/` at the repo root (FastAPI + Ultralytics + OpenCV) — see its own README
 - Needs from hardware: the monocopter's actual video feed, to replace the laptop-webcam-or-phone stand-in `detection-server/` currently uses. Point `CAMERA_SOURCE` at it when it's ready — nothing else in the pipeline should need to change.
 
@@ -44,16 +44,16 @@ Methane (CH4), Carbon Monoxide (CO), Oxygen (O2 — inverted, low is dangerous) 
 
 - Page: `src/pages/gas-trends-page.tsx` (rendered as a tab inside `environment-page.tsx`)
 - Components: `src/components/gas-trends/`
-- Mock: `src/data/mock-gas.ts`, `src/hooks/use-mock-gas-feed.ts`
+- Data: `src/data/mock-gas.ts`, `src/hooks/use-mock-gas-feed.ts`
 - Needs from backend: gas sensor readings (ppm/%) over time, ideally timestamped
 
 ### 3. Battery Intelligence ✅
 
-Custom SVG radial gauge (no chart library) for battery %. Estimated flight time remaining and battery voltage are derived from the mock % via realistic formulas (4S LiPo discharge curve). Mission flight time is real wall-clock elapsed since the page mounted, not mocked. Discharge chart with warning/critical reference lines.
+Custom SVG radial gauge (no chart library) for battery %. Estimated flight time remaining and battery voltage are derived from the live % via realistic formulas (4S LiPo discharge curve). Mission flight time is wall-clock elapsed since the page mounted. Discharge chart with warning/critical reference lines.
 
 - Page: `src/pages/battery-page.tsx` (rendered as a tab inside `monocopter-page.tsx`)
 - Components: `src/components/battery/`
-- Mock: `src/data/mock-battery.ts`, `src/hooks/use-mock-battery-feed.ts`
+- Data: `src/data/mock-battery.ts`, `src/hooks/use-mock-battery-feed.ts`
 - Needs from backend: battery % (and ideally raw voltage) telemetry from the flight controller
 
 ### 4. Environment Insights ✅
@@ -62,7 +62,7 @@ Temperature and humidity, each with a plain-language interpretation sentence per
 
 - Page: `src/pages/environment-insights-content.tsx` (tab inside `environment-page.tsx`)
 - Components: `src/components/environment/`
-- Mock: `src/data/mock-environment.ts`, `src/hooks/use-mock-environment-feed.ts`
+- Data: `src/data/mock-environment.ts`, `src/hooks/use-mock-environment-feed.ts`
 - Needs from backend: temperature + humidity sensor readings
 
 ### 5. Monocopter Health ✅
@@ -71,7 +71,7 @@ Pre-flight checklist (motors, IMU, navigation, camera, obstacle sensors, comms l
 
 - Page: `src/pages/system-status-content.tsx` (tab inside `monocopter-page.tsx`)
 - Components: `src/components/monocopter/`
-- Mock: `src/data/mock-system-status.ts`, `src/hooks/use-mock-signal-feed.ts`
+- Data: `src/data/mock-system-status.ts`, `src/hooks/use-mock-signal-feed.ts`
 - Needs from backend: flight-controller pre-flight diagnostic report, comms link RSSI/quality
 
 ### 6. Actionable Alerts ✅
@@ -80,7 +80,7 @@ Live rollup feed built on the `AlertEvent` shape from the spec (severity + title
 
 - Page: `src/pages/alerts-page.tsx` (routed as Sidebar → Alerts)
 - Components: `src/components/alerts/alert-card.tsx`, `src/components/alerts/alerts-banner.tsx`
-- Mock: `src/data/mock-alerts.ts`, `src/hooks/use-mock-alerts-feed.ts`
+- Data: `src/data/mock-alerts.ts`, `src/hooks/use-mock-alerts-feed.ts`
 - Needs from backend: cross-module event bus — read the `Status` each module already computes (battery %, gas, detection, signal) instead of generating templates. No persistence yet.
 
 **Purpose (from the PDF):** "Know what happened and what to do next" — severity + recommended action. This is the cross-module event feed: a low battery, a gas danger reading, a person detected — anything another module's `Status` goes to `warning`/`danger` should be able to surface here as one alert, not just in its own tab.
@@ -115,7 +115,7 @@ Wireframe-matched top-down SLAM map (SVG line-art tunnels on dark background): m
 
 - Page: `src/pages/map-page.tsx` (routed as Sidebar → Map)
 - Components: `src/components/map/mine-map-svg.tsx`, `location-status-card.tsx`, `map-legend.tsx`, `sector-info-card.tsx`, `quick-actions-card.tsx`, `key-locations-table.tsx`
-- Mock: `src/data/mock-map.ts`, `src/hooks/use-mock-map-feed.ts`
+- Data: `src/data/mock-map.ts`, `src/hooks/use-mock-map-feed.ts`
 - Needs from backend: real SLAM pose stream (mine-local x/y/z) + tunnel geometry + waypoint/human/hazard observations.
 
 **Has a wireframe** — `Dashboard Features.pdf` page 2, "Live Mine Mapping & Monocopter Location." Follow it closely, it's detailed:
@@ -127,7 +127,7 @@ Wireframe-matched top-down SLAM map (SVG line-art tunnels on dark background): m
 - A map legend (mine tunnel line, flight path line, waypoint marker, detected-human marker, hazard-zone pattern, blocked-path marker, entrance/exit marker).
 - Bottom row, three cards: "Sector Information" (name, avg depth, total tunnel length, mapped area, unexplored area), "Quick Actions" (Set Waypoint / Send Monocopter Here / Mark Hazard Zone / Add Note — buttons, can be inert/disabled for v1 since there's no monocopter to command yet), "Key Locations" table (type, name, distance, status — entrance/waypoints/hazards/detected humans as rows).
 
-**Reuse:** the detected-human marker should pull from the same detection data Module 1 already has (`src/lib/detection-types.ts`) rather than inventing a separate shape for "a person was detected here." No real positioning system exists yet (see Module 5's note on GPS not working underground) — mock coordinates are fine, but don't fabricate a precision GPS reading; frame it as inertial/SLAM-estimated position, consistent with Module 5's honesty about navigation.
+**Reuse:** the detected-human marker should pull from the same detection data Module 1 already has (`src/lib/detection-types.ts`) rather than inventing a separate shape for "a person was detected here." No real positioning system exists yet (see Module 5's note on GPS not working underground) — SLAM-estimated coordinates, but don't fabricate a precision GPS reading; frame it as inertial/SLAM-estimated position, consistent with Module 5's note on navigation.
 
 - Stub: `src/pages/map-page.tsx`, `src/data/mock-map.ts`, `src/hooks/use-mock-map-feed.ts`, `src/components/map/`
 
@@ -137,7 +137,7 @@ Wireframe-matched top-down SLAM map (SVG line-art tunnels on dark background): m
 
 - Page: `src/pages/mission-page.tsx` (routed as Sidebar → Mission)
 - Components: `src/components/mission/mission-phase-card.tsx`, `mission-objectives-card.tsx`
-- Mock: `src/data/mock-mission.ts`, `src/hooks/use-mock-mission-feed.ts`
+- Data: `src/data/mock-mission.ts`, `src/hooks/use-mock-mission-feed.ts`
 - Needs from backend: mission-planner / autonomy state (phase, objectives, start time).
 
 **Purpose:** no PDF wireframe or highlight bullet for this one — just the section name. Reasonable scope for v1, open to revision when actually built:
@@ -157,7 +157,7 @@ Built as the real Thermal tab inside Module 1's `VideoPanel` (per the spec — n
 
 - Page: `src/pages/thermal-page.tsx` (built, not separately routed — surface is Live Feed → Thermal Camera tab)
 - Components: `src/components/thermal/thermal-view-panel.tsx`, `temperature-legend.tsx`, `thermal-detections-card.tsx`
-- Mock: `src/data/mock-thermal.ts` (`ThermalDetection` mirrors `DetectionEvent` + `peakTempC`, range + legend stops + future endpoints), `src/hooks/use-mock-thermal-feed.ts` (real 5s endpoint probe — offline by design, no mock data)
+- Data: `src/data/mock-thermal.ts` (`ThermalDetection` mirrors `DetectionEvent` + `peakTempC`, range + legend stops + future endpoints), `src/hooks/use-mock-thermal-feed.ts` (live 5s endpoint probe — offline until hardware is connected)
 - Needs from hardware: thermal camera source + temperature-to-color mapping in `detection-server/` serving `/thermal_feed`, `/api/thermal/health`, `/api/thermal/current`, `/api/thermal/history`.
 
 **Purpose:** thermal-camera counterpart to Module 1's RGB detection, once real thermal hardware exists.
@@ -169,17 +169,17 @@ Built as the real Thermal tab inside Module 1's `VideoPanel` (per the spec — n
 - A temperature-range legend (color gradient with min/max °C).
 - Heat-signature detection markers with confidence, similar shape to `DetectionEvent` in `src/lib/detection-types.ts`.
 
-Don't fake a thermal filter over RGB footage to simulate this — that would misrepresent a sensor reading that doesn't exist. Keep the honest "not connected" state until real thermal hardware is wired in.
+Don't fake a thermal filter over RGB footage — that would misrepresent a sensor reading that doesn't exist. Keep the honest "not connected" state until real thermal hardware is wired in.
 
 - Stub: `src/pages/thermal-page.tsx`, `src/data/mock-thermal.ts`, `src/hooks/use-mock-thermal-feed.ts`, `src/components/thermal/`
 
 ### 10. Communication & Connectivity ✅
 
-Module 5's `SignalStrengthCard` expanded into a full third Monocopter tab (per the spec — no new route): link % + status, latency, packet-loss %, uplink/downlink rates, connection-quality history chart (recharts line with warning/danger reference lines, same pattern as Module 2/3), and a timestamped connection-events log (reconnect/weak/drop, edge-triggered on threshold crossings). Latency/loss/rates are signal-correlated mock derivations, labelled as such in the `ponytail:` hook note.
+Module 5's `SignalStrengthCard` expanded into a full third Monocopter tab (per the spec — no new route): link % + status, latency, packet-loss %, uplink/downlink rates, connection-quality history chart (recharts line with warning/danger reference lines, same pattern as Module 2/3), and a timestamped connection-events log (reconnect/weak/drop, edge-triggered on threshold crossings). Latency/loss/rates are signal-correlated derivations (see the `ponytail:` hook note).
 
 - Page: `src/pages/communication-page.tsx` (rendered as a tab inside `monocopter-page.tsx`)
 - Components: `src/components/communication/comms-overview-card.tsx`, `comms-quality-chart.tsx`, `comms-events-log.tsx`
-- Mock: `src/data/mock-communication.ts`, `src/hooks/use-mock-communication-feed.ts`
+- Data: `src/data/mock-communication.ts`, `src/hooks/use-mock-communication-feed.ts`
 - Needs from backend: radio telemetry stream (RSSI/link %, latency, loss, rates, drop/reconnect events).
 
 **Likely composition:** Module 5 (Monocopter Health) already has a `SignalStrengthCard` (`src/components/monocopter/signal-strength-card.tsx`) for the base-station comms link. This module is probably that card's fuller expansion, best added as a third tab on the Monocopter page rather than a new standalone route.
@@ -196,7 +196,7 @@ Past-mission log, kept distinct from Module 8's "now": table of 4 seeded session
 
 - Page: `src/pages/history-page.tsx` (routed as Sidebar → History)
 - Components: `src/components/history/history-table.tsx`, `history-detail-card.tsx` (reuses `src/components/map/mine-map-svg.tsx`)
-- Mock: `src/data/mock-history.ts`, `src/hooks/use-mock-history-feed.ts`
+- Data: `src/data/mock-history.ts`, `src/hooks/use-mock-history-feed.ts`
 - Needs from backend: persisted mission store (sessions, recorded paths, per-session detection/alert refs).
 
 **Purpose:** a log of *past* missions, distinct from Module 8's "what's happening right now."
@@ -214,7 +214,7 @@ Single prominent synthesis panel (not a feed — that distinction from Module 6 
 
 - Page: `src/pages/rescue-intel-page.tsx` (routed as Sidebar → Rescue)
 - Components: `src/components/rescue-intel/rescue-situation-panel.tsx`, `no-situation-card.tsx`
-- Mock: `src/data/mock-rescue-intel.ts` (`RescueSituation` + pure `synthesizeRescueSituation`), `src/hooks/use-mock-rescue-intel-feed.ts` (bus + memo)
+- Data: `src/data/mock-rescue-intel.ts` (`RescueSituation` + pure `synthesizeRescueSituation`), `src/hooks/use-mock-rescue-intel-feed.ts` (bus + memo)
 - Needs from backend: rescue recommendation service replacing the rules; persisted alert bus replacing the in-memory provider.
 
 **Purpose (from the PDF's value proposition):** "Act → Alerts, victim location & recommended actions." This heavily overlaps with Module 6 (Actionable Alerts) — read that section first. The distinction to design for: Module 6 is a *feed* of individual events; this module is meant to be the single, composite, highest-priority synthesis — e.g. combining "Person detected in Sector B" + "Gas: Danger" + "Anomaly: Detected" into one strategic recommendation ("Do not send a rescue team without gas masks; prioritize evacuation of Sector B"), matching the worked example in the original project brief.

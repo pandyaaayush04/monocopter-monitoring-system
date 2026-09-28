@@ -27,7 +27,7 @@ export function RescueIntel() {
           {NODES.map((n, i) => (
             <Reveal key={n.title} delay={i * 70}>
               <li className="relative rounded-xl border bg-card px-4 py-5 text-center shadow-sm">
-                <span className="mx-auto flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <span className="mx-auto flex size-10 items-center justify-center rounded-lg border border-primary/40 text-primary">
                   <n.icon weight="bold" className="size-5" />
                 </span>
                 <p className="mt-3 text-[11px] font-semibold tracking-wider">{n.title}</p>

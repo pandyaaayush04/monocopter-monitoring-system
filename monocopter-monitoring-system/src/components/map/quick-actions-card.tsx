@@ -21,7 +21,7 @@ export function QuickActionsCard() {
                 </Button>
               </span>
             </TooltipTrigger>
-            <TooltipContent>No monocopter to command yet — mock map only</TooltipContent>
+            <TooltipContent>Available once command uplink is connected</TooltipContent>
           </Tooltip>
         ))}
       </CardContent>

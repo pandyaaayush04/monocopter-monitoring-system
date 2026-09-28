@@ -1,7 +1,6 @@
 import { MapTrifoldIcon, MapPinIcon, ThermometerIcon, VideoCameraIcon } from "@phosphor-icons/react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { MineMapSvg } from "@/components/map/mine-map-svg"
 import { SectionHeading } from "@/pages/landing/section-heading"
 import { Reveal } from "@/pages/landing/reveal"
 
@@ -32,7 +31,7 @@ export function MineIntel() {
           <ul className="mt-6 flex flex-col gap-4">
             {FEATURES.map((f) => (
               <li key={f.text} className="flex items-center gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-primary/40 text-primary">
                   <f.icon weight="bold" className="size-4.5" />
                 </span>
                 <span className="text-sm">{f.text}</span>
@@ -54,10 +53,14 @@ export function MineIntel() {
                 </div>
               </CardHeader>
               <CardContent className="px-4">
-                <div className="overflow-hidden rounded-lg border">
-                  <MineMapSvg progress={0.55} />
+                <div className="relative overflow-hidden rounded-lg border">
+                  <img src="/images/mine-map.jpg" alt="Live SLAM mine map — Sector B" className="block h-auto w-full" />
+                  <div className="absolute top-2 left-2 w-20 overflow-hidden rounded-md border border-white/20 shadow-md sm:w-24">
+                    <img src="/images/mine-tunnel-terrain.png" alt="Sector B-4 camera feed" className="block aspect-[4/3] h-auto w-full object-cover" />
+                    <span className="absolute inset-x-0 bottom-0 bg-black/70 px-1.5 py-0.5 text-[8px] font-semibold tracking-wider text-white">SECTOR B-4</span>
+                  </div>
                 </div>
-                <p className="text-muted-foreground mt-2 text-[11px]">Live SLAM map from the console — same component.</p>
+                <p className="text-muted-foreground mt-2 text-[11px]">Live SLAM map from the console.</p>
               </CardContent>
             </Card>
             <div className="flex flex-col gap-4">

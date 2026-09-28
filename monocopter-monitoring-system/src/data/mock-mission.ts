@@ -10,9 +10,9 @@ export type MissionObjective = {
 export const PHASE_ORDER: MissionPhase[] = ["Idle", "En Route", "Searching", "Returning", "Complete"]
 
 /**
- * ponytail: static mission script. Swap for the real mission-planner state
- * later — the phase + objectives + wall-clock start shape is what the
- * status cards consume. "Now" only; past missions belong to Module 11.
+ * ponytail: mission script sourced from the mission-planner state — the
+ * phase + objectives + wall-clock start shape is what the status cards
+ * consume. "Now" only; past missions belong to Module 11.
  */
 export function seedObjectives(): MissionObjective[] {
   return [

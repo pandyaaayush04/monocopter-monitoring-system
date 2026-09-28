@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:all": "concurrently -n dashboard,backend -c blue,yellow \"npm run dev\" \"cd ../detection-server && python server.py\"",
+    "dev:all": "concurrently -n dashboard,detection,auth -c blue,yellow,green \"npm run dev\" \"cd ../detection-server && python server.py\" \"cd ../auth-server && npm run dev\"",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"

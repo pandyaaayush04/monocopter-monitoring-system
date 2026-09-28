@@ -3,13 +3,12 @@ import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react"
 
 import { Badge } from "@/components/ui/badge"
 import { SectionHeading } from "@/pages/landing/section-heading"
-import { TunnelArt } from "@/pages/landing/tunnel-art"
 import { Reveal } from "@/pages/landing/reveal"
-import { THERMAL_LEGEND_STOPS, THERMAL_RANGE } from "@/data/mock-thermal"
+import { THERMAL_RANGE } from "@/data/mock-thermal"
 
 /** Draggable RGB / thermal comparison — the signature interaction. */
 function CompareSlider() {
-  const [pos, setPos] = useState(50)
+  const [pos, setPos] = useState(25)
   const trackRef = useRef<HTMLDivElement>(null)
   const draggingRef = useRef(false)
 
@@ -36,7 +35,7 @@ function CompareSlider() {
       }}
       onPointerDown={(e) => {
         draggingRef.current = true
-        ;(e.target as HTMLElement).setPointerCapture?.(e.pointerId)
+          ; (e.target as HTMLElement).setPointerCapture?.(e.pointerId)
         setFromClientX(e.clientX)
       }}
       onPointerMove={(e) => {
@@ -47,42 +46,22 @@ function CompareSlider() {
       }}
       className="relative aspect-video cursor-ew-resize touch-none overflow-hidden rounded-xl border shadow-lg select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
     >
-      {/* thermal layer (base) */}
-      <div className="absolute inset-0" aria-hidden="true">
-        <svg viewBox="0 0 400 240" className="block h-full w-full" preserveAspectRatio="xMidYMid slice">
-          <defs>
-            <linearGradient id="vis-heat" x1="0" y1="0" x2="1" y2="0">
-              {THERMAL_LEGEND_STOPS.map((c, i) => (
-                <stop key={c} offset={`${(i / (THERMAL_LEGEND_STOPS.length - 1)) * 100}%`} stopColor={c} />
-              ))}
-            </linearGradient>
-            <radialGradient id="vis-hot" cx="50%" cy="55%" r="30%">
-              <stop offset="0%" stopColor="#FEFCE8" />
-              <stop offset="100%" stopColor="#FEFCE8" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-          <rect width="400" height="240" fill="url(#vis-heat)" opacity="0.55" />
-          <rect width="400" height="240" fill="#0B0E14" opacity="0.45" />
-          <ellipse cx="200" cy="150" rx="110" ry="95" fill="none" stroke="#0B0E14" strokeWidth="26" opacity="0.8" />
-          <ellipse cx="200" cy="140" rx="34" ry="60" fill="url(#vis-hot)" opacity="0.9" />
-          {/* heat figure */}
-          <circle cx="200" cy="112" r="11" fill="#FEFCE8" />
-          <rect x="186" y="124" width="28" height="44" rx="10" fill="#FDE68A" />
-          <rect x="188" y="168" width="11" height="30" rx="5" fill="#F59E0B" />
-          <rect x="201" y="168" width="11" height="30" rx="5" fill="#F59E0B" />
-        </svg>
+      {/* thermal layer (base) — real thermal-camera readout, cropped past the device bezel */}
+      <div className="absolute inset-0 overflow-hidden bg-black" aria-hidden="true">
+        <img
+          src="/images/thermal-readout.png"
+          alt=""
+          className="absolute top-1/2 left-1/2 h-[145%] w-[145%] -translate-x-1/2 -translate-y-1/2 object-cover"
+        />
         <span className="absolute top-3 right-3 rounded-md bg-black/60 px-2 py-1 text-[10px] font-semibold tracking-wider text-white">
           THERMAL VIEW
         </span>
-        <span className="absolute top-16 right-8 rounded-sm border-2 border-warning px-1 text-[9px] font-bold text-warning md:top-24 md:right-16">
-          0.94
-        </span>
       </div>
 
-      {/* normal layer (clipped) */}
+      {/* normal layer (clipped) — same centered zoom as the thermal layer so both views match */}
       <div className="absolute inset-0 overflow-hidden" style={{ width: `${pos}%` }}>
-        <div style={{ width: `${(100 / pos) * 100}%` }} className="h-full">
-          <TunnelArt variant="dim" label="" className="block h-full w-full" />
+        <div style={{ width: `${(100 / pos) * 100}%` }} className="relative h-full">
+          <img src="/images/low_visibility_card.png" alt="" className="absolute top-1/2 left-1/2 h-[145%] w-[145%] -translate-x-1/2 -translate-y-1/2 object-cover brightness-50" />
         </div>
         <span className="absolute top-3 left-3 rounded-md bg-black/60 px-2 py-1 text-[10px] font-semibold tracking-wider text-white">
           NORMAL VIEW

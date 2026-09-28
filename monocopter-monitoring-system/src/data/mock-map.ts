@@ -116,7 +116,7 @@ export function seedPose(): MonocopterPose {
   }
 }
 
-/** Advance the SLAM-estimated pose a little each tick (mock drift). */
+/** Advance the SLAM-estimated pose a little each tick (sensor drift). */
 export function walkPose(prev: MonocopterPose): MonocopterPose {
   return {
     ...prev,

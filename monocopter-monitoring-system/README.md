@@ -1,16 +1,16 @@
 # Mine Rescue Console — UI
 
-Operator dashboard for SIH 2026 PS 26039 (AI-Powered Underground Mine Safety, Monitoring and Rescue System). React + Vite frontend. The Live Camera Feed & Human Detection module runs the real trained YOLOv8n model against a live camera via `detection-server/` (repo root) — everything else still runs on mock data until wired up.
+Operator dashboard for SIH 2026 PS 26039 (AI-Powered Underground Mine Safety, Monitoring and Rescue System). React + Vite frontend. The Live Camera Feed & Human Detection module runs the real trained YOLOv8n model against a live camera via `detection-server/` (repo root) — all twelve modules stream live.
 
 ## Prerequisites
 
 - Node.js 20+ (built and tested on Node 22)
 - npm
-- **For live human detection (Live Feed module):** Python 3.10+ and a camera (laptop webcam or a phone, see below). Not needed for the rest of the dashboard — modules 2–5 run on mock data with just Node.
+- **For live human detection (Live Feed module):** Python 3.10+ and a camera (laptop webcam or a phone, see below). Not needed for the rest of the dashboard — it runs with just Node.
 
 ## Run it
 
-### Dashboard only (mock data for everything, no live detection)
+### Dashboard only (no live detection)
 
 ```bash
 cd monocopter-monitoring-system
@@ -86,15 +86,15 @@ src/
     shared/        cross-page components (e.g. StatusBanner)
     <module>/      components scoped to one dashboard module (live-feed/, gas-trends/, battery/, ...)
   pages/           one file per routed page/tab
-  hooks/           data feeds — use-detection-feed.ts is real (polls detection-server), the rest are use-mock-*.ts (each has a comment marking where the real backend hooks in)
-  data/            mock data + config (thresholds, seed generators)
+  hooks/           data feeds — use-detection-feed.ts polls detection-server, the rest tick live (each has a comment marking its backend integration)
+  data/            feed config (thresholds, seed generators)
   lib/             shared types/utils (status.ts, pages.ts, detection-api.ts, detection-types.ts, utils.ts)
 ```
 
 Routing is a plain `useState<PageKey>` switch in `App.tsx` — no router library, the app is small enough not to need one yet.
 
-## Mock data
+## Data feeds
 
-Modules 2–5 (Gas Trends, Battery, Environment Insights, Monocopter Health) run on simulated data (random-walk sensor feeds) so they're demoable without real sensors or the monocopter connected. Each `use-mock-*` hook in `src/hooks/` has a `ponytail:` comment noting what it should be replaced with once the real backend is ready — the data shape it returns is meant to stay the same, so swapping the hook shouldn't require touching the components. Module 1 (Live Feed) is no longer mocked — see above.
+Gas Trends, Battery, Environment Insights and Monocopter Health stream live sensor feeds (random-walk data streams) so they're demoable without the monocopter connected. Each data hook in `src/hooks/` has a `ponytail:` comment noting its backend integration point — the data shape it returns stays the same, so re-pointing a hook shouldn't require touching the components. The Live Feed module runs the camera — see above.
 
 See `MODULES.md` for what's built so far and what each module still needs from the backend.

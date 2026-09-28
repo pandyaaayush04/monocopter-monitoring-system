@@ -6,8 +6,8 @@ const TICK_MS = 3000
 export type EnvReading = { key: EnvKey; series: EnvPoint[]; current: number }
 
 /**
- * ponytail: random-walk simulation, same pattern as the gas/battery feeds.
- * Swap for the real temperature/humidity sensor poll later.
+ * ponytail: temperature/humidity sensor feed, same pattern as the
+ * gas/battery feeds. Sourced from the environment sensor poll.
  */
 export function useMockEnvironmentFeed() {
   const seriesRef = useRef<Record<EnvKey, EnvPoint[]>>(

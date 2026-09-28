@@ -9,7 +9,7 @@ import { useMockThermalFeed } from "@/hooks/use-mock-thermal-feed"
  * the video-panel/detection pattern isn't duplicated across routes.
  */
 export function ThermalPage() {
-  const { online, detections } = useMockThermalFeed()
+  const { online, setOnline, detections } = useMockThermalFeed()
 
   return (
     <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-[1fr_320px] lg:p-6">
@@ -20,7 +20,7 @@ export function ThermalPage() {
             False-color heat view with heat-signature detection — once thermal hardware is wired in
           </p>
         </div>
-        <ThermalViewPanel online={online} />
+        <ThermalViewPanel online={online} onError={() => setOnline(false)} />
       </div>
 
       <div className="flex flex-col gap-4">

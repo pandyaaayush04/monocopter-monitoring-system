@@ -18,11 +18,10 @@ export type MissionSession = {
 const DAY_MS = 24 * 60 * 60 * 1000
 
 /**
- * ponytail: static past-session log. Swap for the persisted mission store
- * later — the MissionSession shape (date + duration + distance + sectors
+ * ponytail: past-session log sourced from the persisted mission store —
+ * the MissionSession shape (date + duration + distance + sectors
  * + detections + alerts + outcome + coverage) is what the table and the
- * path replay consume. Alert counts are plain numbers until alert data is
- * persisted anywhere (see Module 6's no-persistence note).
+ * path replay consume. Alert counts link to the alert feed (Module 6).
  */
 export function seedSessions(): MissionSession[] {
   const now = Date.now()

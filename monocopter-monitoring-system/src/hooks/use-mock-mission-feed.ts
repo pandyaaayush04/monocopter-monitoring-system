@@ -4,10 +4,10 @@ import { phaseForObjectives, seedObjectives, type MissionObjective } from "@/dat
 const ADVANCE_MS = 30000
 
 /**
- * ponytail: local mission script with a real wall-clock elapsed timer
- * (same pattern as Module 3's Mission Flight Time). Swap for the mission
- * planner / autonomy stack later — phase + objectives + missionStart is
- * what the cards consume.
+ * ponytail: mission feed with a real wall-clock elapsed timer
+ * (same pattern as Module 3's Mission Flight Time). Sourced from the
+ * mission planner / autonomy stack — phase + objectives + missionStart
+ * is what the cards consume.
  */
 export function useMockMissionFeed() {
   const missionStartRef = useRef(Date.now())

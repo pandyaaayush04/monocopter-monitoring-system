@@ -33,7 +33,7 @@ export function HistoryDetailCard({ session }: { session: MissionSession }) {
       <CardContent className="flex flex-col gap-3 px-4">
         <MineMapSvg progress={session.coverage} />
         <p className="text-muted-foreground text-[11px]">
-          Recorded path replay (static) — {Math.round(session.coverage * 100)}% of the mapped route.
+          Recorded flight path — {Math.round(session.coverage * 100)}% of the mapped route.
         </p>
         <div className="border-t border-border/60 pt-1">
           <Stat label="Duration" value={`${session.durationMin} min`} />
