@@ -6,6 +6,8 @@ import {
   ClipboardTextIcon,
   BellIcon,
   ClockCounterClockwiseIcon,
+  SirenIcon,
+  GlobeIcon,
 } from "@phosphor-icons/react"
 
 import { MonocopterMark } from "@/components/monocopter-mark"
@@ -26,20 +28,23 @@ import type { PageKey } from "@/lib/pages"
 
 const NAV: Array<{ key: PageKey; title: string; icon: typeof VideoCameraIcon; enabled: boolean }> = [
   { key: "live-feed", title: "Live Feed", icon: VideoCameraIcon, enabled: true },
-  { key: "map", title: "Map", icon: MapTrifoldIcon, enabled: false },
+  { key: "map", title: "Map", icon: MapTrifoldIcon, enabled: true },
   { key: "environment", title: "Environment", icon: WindIcon, enabled: true },
   { key: "monocopter", title: "Monocopter", icon: DroneIcon, enabled: true },
-  { key: "mission", title: "Mission", icon: ClipboardTextIcon, enabled: false },
-  { key: "alerts", title: "Alerts", icon: BellIcon, enabled: false },
-  { key: "history", title: "History", icon: ClockCounterClockwiseIcon, enabled: false },
+  { key: "mission", title: "Mission", icon: ClipboardTextIcon, enabled: true },
+  { key: "alerts", title: "Alerts", icon: BellIcon, enabled: true },
+  { key: "history", title: "History", icon: ClockCounterClockwiseIcon, enabled: true },
+  { key: "rescue", title: "Rescue", icon: SirenIcon, enabled: true },
 ]
 
 export function AppSidebar({
   page,
   onNavigate,
+  onBackToSite,
 }: {
   page: PageKey
   onNavigate: (page: PageKey) => void
+  onBackToSite?: () => void
 }) {
   return (
     <Sidebar collapsible="icon">
@@ -86,6 +91,16 @@ export function AppSidebar({
         <p className="text-muted-foreground/70 px-2 text-[11px] leading-tight group-data-[collapsible=icon]:hidden">
           Safer Mines, Brighter Tomorrows
         </p>
+        {onBackToSite && (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={onBackToSite} tooltip="Back to site">
+                <GlobeIcon />
+                <span>Site</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
       </SidebarFooter>
     </Sidebar>
   )

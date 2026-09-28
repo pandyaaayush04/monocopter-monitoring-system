@@ -1,5 +1,6 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { BatteryPage } from "@/pages/battery-page"
+import { CommunicationPage } from "@/pages/communication-page"
 import { SystemStatusContent } from "@/pages/system-status-content"
 
 export function MonocopterPage() {
@@ -9,12 +10,16 @@ export function MonocopterPage() {
         <TabsList>
           <TabsTrigger value="status">System Status</TabsTrigger>
           <TabsTrigger value="battery">Battery</TabsTrigger>
+          <TabsTrigger value="connectivity">Connectivity</TabsTrigger>
         </TabsList>
         <TabsContent value="status">
           <SystemStatusContent />
         </TabsContent>
         <TabsContent value="battery">
           <BatteryPage />
+        </TabsContent>
+        <TabsContent value="connectivity">
+          <CommunicationPage />
         </TabsContent>
       </Tabs>
     </div>

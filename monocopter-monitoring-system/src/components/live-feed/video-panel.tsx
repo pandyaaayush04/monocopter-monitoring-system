@@ -5,7 +5,6 @@ import {
   CornersOutIcon,
   SlidersHorizontalIcon,
   VideoCameraSlashIcon,
-  ThermometerIcon,
   PlugsConnectedIcon,
 } from "@phosphor-icons/react"
 
@@ -16,6 +15,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { TemperatureLegend } from "@/components/thermal/temperature-legend"
+import { ThermalDetectionsCard } from "@/components/thermal/thermal-detections-card"
+import { ThermalViewPanel } from "@/components/thermal/thermal-view-panel"
+import { useMockThermalFeed } from "@/hooks/use-mock-thermal-feed"
 import { DETECTION_API_URL, VIDEO_FEED_URL } from "@/lib/detection-api"
 
 export function VideoPanel({
@@ -28,6 +31,7 @@ export function VideoPanel({
   const panelRef = useRef<HTMLDivElement>(null)
   const [source, setSource] = useState<"rgb" | "thermal">("rgb")
   const [recording, setRecording] = useState(false)
+  const { online: thermalOnline, detections: thermalDetections } = useMockThermalFeed()
 
   const ready = online && cameraOpen
 
@@ -66,11 +70,11 @@ export function VideoPanel({
         </Tabs>
       </div>
 
+      {source === "rgb" ? (
       <div
         ref={panelRef}
         className="smooth-shadow-ring-md relative aspect-video w-full overflow-hidden rounded-xl bg-neutral-950"
       >
-        {source === "rgb" ? (
           <>
             {ready ? (
               <img src={VIDEO_FEED_URL} alt="Live detection feed" className="size-full object-contain" />
@@ -95,14 +99,18 @@ export function VideoPanel({
               {timestamp}
             </div>
           </>
+      </div>
         ) : (
-          <div className="text-neutral-400 absolute inset-0 flex flex-col items-center justify-center gap-2">
-            <ThermometerIcon className="size-8" />
-            <p className="text-sm">Thermal camera not connected</p>
+          <div className="flex flex-col gap-3">
+            <ThermalViewPanel online={thermalOnline} />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <TemperatureLegend online={thermalOnline} />
+              <ThermalDetectionsCard detections={thermalDetections} online={thermalOnline} />
+            </div>
           </div>
         )}
-      </div>
 
+      {source === "rgb" && (
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="outline" size="sm" onClick={handleSnapshot} disabled={!ready}>
           <CameraIcon />
@@ -134,6 +142,7 @@ export function VideoPanel({
           <TooltipContent>Arrives with camera calibration module</TooltipContent>
         </Tooltip>
       </div>
+      )}
     </div>
   )
 }

@@ -1,4 +1,16 @@
-// TODO: Module 11 — Flight Path & Mission History. See MODULES.md for scope.
-// Mock feed hook goes here, matching the pattern in
-// use-mock-gas-feed.ts / use-mock-battery-feed.ts / use-mock-environment-feed.ts.
-export {}
+import { useState } from "react"
+import { seedSessions } from "@/data/mock-history"
+
+/**
+ * ponytail: static past-mission log, no ticking (history doesn't change
+ * live). Swap for a fetch against the persisted mission store later —
+ * newest-first sessions + selected id is what the table/replay consume.
+ */
+export function useMockHistoryFeed() {
+  const [sessions] = useState(() => seedSessions())
+  const [selectedId, setSelectedId] = useState(sessions[0]?.id ?? "")
+
+  const selected = sessions.find((s) => s.id === selectedId) ?? sessions[0]
+
+  return { sessions, selected, selectedId, select: setSelectedId }
+}
