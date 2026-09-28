@@ -27,9 +27,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .catch(() => setStatus("signed-out"))
   }, [])
 
-  const login = useCallback(async (email: string, password: string) => {
-    const { user } = await authApi.login(email, password)
-    setUser(user)
+  // ponytail: frontend-only for now - no auth-server call, any email/password works.
+  // Swap this back to `await authApi.login(email, password)` once auth-server is deployed.
+  const login = useCallback(async (email: string, _password: string) => {
+    setUser({ id: "local", name: email.split("@")[0], email, emailVerified: false, hasPassword: true })
     setStatus("signed-in")
   }, [])
 
