@@ -8,6 +8,13 @@ import { QuickActionsCard } from "@/components/map/quick-actions-card"
 import { SectorInfoCard } from "@/components/map/sector-info-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { SECTORS } from "@/data/mock-map"
 import { useMockBatteryFeed } from "@/hooks/use-mock-battery-feed"
@@ -29,18 +36,18 @@ export function MapPage() {
         <Card className="smooth-shadow-sm py-4 xl:col-span-2">
           <CardContent className="flex flex-col gap-3 px-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <select
-                value={sectorId}
-                onChange={(e) => setSectorId(e.target.value)}
-                className="h-8 rounded-lg border border-border bg-card px-2 text-xs font-medium"
-                aria-label="Select sector view"
-              >
-                {SECTORS.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
+              <Select value={sectorId} onValueChange={setSectorId}>
+                <SelectTrigger size="sm" className="w-36" aria-label="Select sector view">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SECTORS.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span>

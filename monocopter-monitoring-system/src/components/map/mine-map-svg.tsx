@@ -4,7 +4,6 @@ import {
   FLIGHT_PATH,
   HAZARD_ZONE,
   HUMAN_MARKER,
-  TUNNEL_PATHS,
   WAYPOINTS,
   poseToSvg,
 } from "@/data/mock-map"
@@ -16,7 +15,9 @@ function pathFromPoints(pts: { x: number; y: number }[]): string {
 export function MineMapSvg({ progress }: { progress: number }) {
   const travelledCount = Math.max(2, Math.floor(progress * FLIGHT_PATH.length))
   const travelled = FLIGHT_PATH.slice(0, travelledCount)
-  const copter = poseToSvg(progress)
+  const base = poseToSvg(progress)
+  // nudge the marker slightly above the path so it sits clear of the line
+  const copter = { x: base.x, y: base.y - 8 }
 
   return (
     <svg viewBox="0 0 400 300" className="h-auto w-full" role="img" aria-label="Mine tunnel map">
@@ -27,15 +28,8 @@ export function MineMapSvg({ progress }: { progress: number }) {
         </pattern>
       </defs>
 
-      <rect x="0" y="0" width="400" height="300" rx="12" fill="#0b0e14" />
-
-      {/* tunnels */}
-      {TUNNEL_PATHS.map((d, i) => (
-        <path key={i} d={d} fill="none" stroke="#3a4356" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-      ))}
-      {TUNNEL_PATHS.map((d, i) => (
-        <path key={`c-${i}`} d={d} fill="none" stroke="#8b94a7" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="1 5" opacity="0.7" />
-      ))}
+      <image href="/images/mine-map-b.png" x="0" y="0" width="400" height="300" preserveAspectRatio="xMidYMid slice" />
+      <rect x="0" y="0" width="400" height="300" rx="12" fill="#000000" opacity="0.35" />
 
       {/* hazard zone */}
       <rect

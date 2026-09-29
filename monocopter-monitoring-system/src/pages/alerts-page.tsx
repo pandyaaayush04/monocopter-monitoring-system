@@ -4,6 +4,13 @@ import { CheckCircleIcon } from "@phosphor-icons/react"
 import { AlertCard } from "@/components/alerts/alert-card"
 import { AlertsBanner } from "@/components/alerts/alerts-banner"
 import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useAlertsBus } from "@/lib/alerts-bus"
 import { ALERT_SOURCE_LABEL, type AlertSeverity, type AlertSource } from "@/data/mock-alerts"
 
@@ -59,18 +66,18 @@ export function AlertsPage() {
           </Button>
         ))}
         <span className="text-muted-foreground mx-1 hidden text-xs sm:inline">·</span>
-        <select
-          value={source}
-          onChange={(e) => setSource(e.target.value as SourceFilter)}
-          className="h-8 rounded-lg border border-border bg-card px-2 text-xs font-medium"
-          aria-label="Filter by source module"
-        >
-          {SOURCE_TABS.map((t) => (
-            <option key={t.key} value={t.key}>
-              {t.label}
-            </option>
-          ))}
-        </select>
+        <Select value={source} onValueChange={(v) => setSource(v as SourceFilter)}>
+          <SelectTrigger size="sm" className="w-36" aria-label="Filter by source module">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SOURCE_TABS.map((t) => (
+              <SelectItem key={t.key} value={t.key}>
+                {t.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {acknowledgedCount > 0 && (
           <Button variant="ghost" size="sm" className="ml-auto" onClick={clearAcknowledged}>
             Clear {acknowledgedCount} acknowledged

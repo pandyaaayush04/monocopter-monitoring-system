@@ -71,6 +71,56 @@ A centralized rescue-operator interface providing real-time situational awarenes
 
 ---
 
+## 🖥️ Platform Preview
+
+### Landing page
+
+<img src="monocopter-monitoring-system/public/screenshots/landing-hero.png" alt="MineWatch landing page hero" width="100%"/>
+
+> *First impression: headline, live mission telemetry and the RGB-vs-thermal story.*
+
+<img src="monocopter-monitoring-system/public/screenshots/landing-sections.png" alt="MineWatch landing page sections" width="100%"/>
+
+> *System, vision, intelligence and rescue sections in one scroll.*
+
+### Live feed: RGB view
+
+<img src="monocopter-monitoring-system/public/screenshots/live-feed-rgb.png" alt="Live camera feed with human detection" width="100%"/>
+
+> *Trained YOLOv8n detections with bounding boxes, confidence, history and snapshots.*
+
+### Live feed: thermal view
+
+<img src="monocopter-monitoring-system/public/screenshots/live-feed-thermal.png" alt="Thermal view tab" width="100%"/>
+
+> *Thermal tab with temperature legend and heat-signature detections.*
+
+### Map view
+
+<img src="monocopter-monitoring-system/public/screenshots/map-view.png" alt="SLAM mine map with waypoints and hazards" width="100%"/>
+
+> *Tunnel map with flight path, numbered waypoints, hazard zones and detected humans.*
+
+### Sensor readings
+
+<img src="monocopter-monitoring-system/public/screenshots/sensors-reading.png" alt="Gas trends and environment insights" width="100%"/>
+
+> *Methane, CO and oxygen trends with warning/danger lines, plus temperature and humidity insights.*
+
+### Battery status
+
+<img src="monocopter-monitoring-system/public/screenshots/battery-status.png" alt="Battery intelligence" width="100%"/>
+
+> *Charge gauge, flight-time estimate, voltage curve and discharge history.*
+
+### Overall mission status
+
+<img src="monocopter-monitoring-system/public/screenshots/mission-status.png" alt="Mission status with phase and objectives" width="100%"/>
+
+> *Live phase, elapsed time, objectives — with history replay and rescue synthesis one click away.*
+
+---
+
 ## The Problem We Are Solving
 
 Underground coal mine accidents (collapses, gas leaks, fires) put rescue teams at risk the moment they enter a mine whose conditions are already unknown:

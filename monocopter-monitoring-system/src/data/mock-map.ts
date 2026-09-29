@@ -45,40 +45,40 @@ export const TUNNEL_PATHS: string[] = [
 ]
 
 export const FLIGHT_PATH: MapPoint[] = [
-  { x: 20, y: 250 },
-  { x: 90, y: 250 },
-  { x: 140, y: 210 },
-  { x: 220, y: 210 },
-  { x: 270, y: 160 },
-  { x: 360, y: 160 },
+  { x: 14, y: 200 },
+  { x: 93, y: 201 },
+  { x: 146, y: 153 },
+  { x: 241, y: 153 },
+  { x: 286, y: 102 },
+  { x: 361, y: 102 },
 ]
 
 export const WAYPOINTS: Waypoint[] = [
-  { id: "wp1", label: "WP-1", x: 90, y: 250, visited: true },
-  { id: "wp2", label: "WP-2", x: 140, y: 210, visited: true },
-  { id: "wp3", label: "WP-3", x: 220, y: 210, visited: true },
-  { id: "wp4", label: "WP-4", x: 270, y: 160, visited: false },
-  { id: "wp5", label: "WP-5", x: 360, y: 160, visited: false },
+  { id: "wp1", label: "WP-1", x: 93, y: 201, visited: true },
+  { id: "wp2", label: "WP-2", x: 146, y: 153, visited: true },
+  { id: "wp3", label: "WP-3", x: 241, y: 153, visited: true },
+  { id: "wp4", label: "WP-4", x: 286, y: 102, visited: false },
+  { id: "wp5", label: "WP-5", x: 361, y: 102, visited: false },
 ]
 
 export const HUMAN_MARKER: MapPoint & { label: string; confidence: number } = {
-  x: 248,
-  y: 188,
+  x: 252,
+  y: 141,
   label: "Detected human — last known",
   confidence: 0.82,
 }
 
-export const HAZARD_ZONE = { x: 250, y: 230, w: 60, h: 40, label: "Hazard zone" }
+export const HAZARD_ZONE = { x: 305, y: 213, w: 66, h: 22, label: "Hazard zone" }
 
 export const BLOCKED_PATH: MapPoint & { label: string } = {
-  x: 300,
-  y: 80,
+  x: 328,
+  y: 32,
   label: "Blocked path",
 }
 
 export const ENTRANCE: MapPoint & { label: string } = {
-  x: 20,
-  y: 250,
+  x: 14,
+  y: 200,
   label: "Entrance / Exit",
 }
 
